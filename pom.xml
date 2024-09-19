@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+ 
+ <!-- <parent>
+    <groupId>com.dentista</groupId>
+    <artifactId>gestione-dentista</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent> -->
+ <!-- <groupId>${project.groupId}</groupId> -->
+  <artifactId>gestione-dentista-appuntamento</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>gestione-dentista-appuntamento</name>
+  
+   <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.5</version> <!-- Usa la versione appropriata di Spring Boot -->
+    <relativePath /> <!-- lookup parent from repository -->
+  </parent>
+  
+  <properties>
+    <java.version>11</java.version>
+  </properties>
+  
+  <dependencies>
+	  
+	   <dependency>
+        <groupId>com.dentista</groupId>
+        <artifactId>sicurezza</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency> 
+	  
+	  <dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+
+ <!-- Email dependency -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+
+    <!-- Push notifications dependency (es. Firebase) -->
+    <dependency>
+        <groupId>com.google.firebase</groupId>
+        <artifactId>firebase-admin</artifactId>
+    <version>9.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    <!-- <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </exclusion>
+    </exclusions>-->
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-mongodb</artifactId>
+    </dependency>
+
+    <!-- Aggiungi altre dipendenze necessarie -->
+  <!--  <dependency>
+    	<groupId>com.dentista</groupId>
+    	<artifactId>gestione-dentista</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency> -->
+
+    <dependency>
+    	<groupId>com.dentista</groupId>
+    	<artifactId>pazienti</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+  
+  <!--<repositories>
+    <repository>
+        <id>fabric8-releases</id>
+        <url>https://nexus.fabric8.io/nexus/content/repositories/releases/</url>
+    </repository>
+      <repository>
+        <id>central</id>
+        <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+</repositories> -->
+
+   <build>
+        <plugins>
+			 <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.8.1</version> <!-- O una versione compatibile -->
+      <configuration>
+        <source>11</source> <!-- Versione sorgente Java -->
+        <target>11</target> <!-- Versione di destinazione -->
+      </configuration>
+    </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin> 
+        </plugins>
+    </build>
+
+</project>
