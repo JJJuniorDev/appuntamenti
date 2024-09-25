@@ -1,5 +1,6 @@
 package Services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +9,14 @@ import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import Dto.AppuntamentoDTO;
+import Dto.PazienteDTO;
 import Model.Appuntamento;
 import Model.Operazione;
 import Repository.Appuntamento.AppuntamentoRepository;
@@ -19,18 +24,52 @@ import Repository.Appuntamento.AppuntamentoRepository;
 @Service
 public class AppuntamentoService {
 
+	 @Value("${pazienti.service.url}")
+	    private String pazientiServiceUrl;
+
+	    private final RestTemplate restTemplate;
+	    
 	  private final KafkaTemplate<String, Object> kafkaTemplate;
 	  
     @Autowired
     private AppuntamentoRepository appuntamentoRepository;
 
     @Autowired
-    public AppuntamentoService(KafkaTemplate<String, Object> kafkaTemplate, AppuntamentoRepository appuntamentoRepository) {
+    public AppuntamentoService(KafkaTemplate<String, Object> kafkaTemplate, AppuntamentoRepository appuntamentoRepository, RestTemplate restTemplate) {
         this.kafkaTemplate = kafkaTemplate;
         this.appuntamentoRepository= appuntamentoRepository;
+        this.restTemplate = restTemplate;
     }
     
+
     
+    // Chiamata API al microservizio Pazienti
+    public Optional<PazienteDTO> getPazienteById(String pazienteId) {
+        try {
+            PazienteDTO paziente = restTemplate.getForObject(
+                pazientiServiceUrl + "/api/pazienti/" + pazienteId, PazienteDTO.class
+            );
+            return Optional.ofNullable(paziente);
+        } catch (Exception e) {
+            System.err.println("Errore nel recupero del paziente: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+   
+    // Metodo per recuperare l'appuntamento con i dettagli del paziente
+    public Optional<AppuntamentoDTO> getAppuntamentoConPaziente(String appuntamentoId) {
+        Optional<Appuntamento> appuntamentoOpt = getAppuntamento(appuntamentoId);
+        if (appuntamentoOpt.isPresent()) {
+            Appuntamento appuntamento = appuntamentoOpt.get();
+            Optional<PazienteDTO> pazienteOpt = getPazienteById(appuntamento.getPazienteId());
+            
+            if (pazienteOpt.isPresent()) {
+                AppuntamentoDTO appuntamentoDTO = new AppuntamentoDTO(appuntamento, pazienteOpt.get());
+                return Optional.of(appuntamentoDTO);
+            }
+        }
+        return Optional.empty();
+    }
     
     public Map<String, Object> getAppuntamentiStatistics(String dentistaId) {
         Map<String, Object> stats = new HashMap<>();
@@ -58,10 +97,29 @@ public class AppuntamentoService {
         return appuntamentoRepository.findByDentistaId(dentistaId);
     }
     
-    public List<Appuntamento> getAllAppuntamenti() {
+    public List<AppuntamentoDTO> getAllAppuntamenti() {
+        List<Appuntamento> appuntamenti = appuntamentoRepository.findAll();
+        List<AppuntamentoDTO> appuntamentiDTO = new ArrayList<>();
+
+        for (Appuntamento appuntamento : appuntamenti) {
+            Optional<PazienteDTO> pazienteOpt = getPazienteById(appuntamento.getPazienteId());
+            
+            if (pazienteOpt.isPresent()) {
+                AppuntamentoDTO appuntamentoDTO = new AppuntamentoDTO(appuntamento, pazienteOpt.get());
+                appuntamentiDTO.add(appuntamentoDTO);
+            } else {
+                System.err.println("Paziente non trovato per l'appuntamento con ID: " + appuntamento.getId());
+            }
+        }
+
+        return appuntamentiDTO;
+    }
+
+    
+  /*  public List<Appuntamento> getAllAppuntamenti() {
     	System.out.println(appuntamentoRepository.count());
         return appuntamentoRepository.findAll();
-    }
+    } */
 
     public Optional<Appuntamento> getAppuntamento(String id) {
         
@@ -134,13 +192,14 @@ public class AppuntamentoService {
                 AppuntamentoDTO dto = new AppuntamentoDTO();
                 dto.setId(appuntamento.getId().toString());
                 dto.setDataEOrario(appuntamento.getDataEOrario());
-                dto.setCodiceFiscalePaziente(appuntamento.getCodiceFiscalePaziente());
                 dto.setTrattamento(appuntamento.getTrattamento());
                 dto.setNote(appuntamento.getNote());
-                dto.setOperazioniIds(appuntamento.getOperazioni()); // Imposta gli ID delle operazioni
+               // dto.setOperazioniIds(appuntamento.getOperazioni()); // Imposta gli ID delle operazioni
                 dto.setOperazioni(operazioni); // Imposta le operazioni complete
                 return dto;
             }
+            
+       
         }
     
 

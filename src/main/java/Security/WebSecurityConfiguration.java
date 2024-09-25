@@ -59,7 +59,9 @@ public class WebSecurityConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://gestionale-dentista-frontend-7nxhklfpb.vercel.app", "https://gestionale-dentista-frontend-7nxhklfpb.vercel.app/api")
+                        .allowedOrigins("https://gestionale-dentista-frontend-7nxhklfpb.vercel.app",
+                        		"https://gestionale-dentista-frontend-7nxhklfpb.vercel.app/api",
+                        		"http://localhost:4200")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,8 +34,19 @@ public class AppuntamentoController {
     @Autowired
     private OperazioneRepository operazioneRepository;
     
+    @GetMapping("/{id}")
+    public ResponseEntity<AppuntamentoDTO> getAppuntamentoConPaziente(@PathVariable String id) {
+    	 if (!ObjectId.isValid(id)) {
+    		   return ResponseEntity.badRequest().build(); // Controllo ID non valido
+    	    }
+    	Optional<AppuntamentoDTO> appuntamentoDTOOpt = appuntamentoService.getAppuntamentoConPaziente(id);
+        return appuntamentoDTOOpt
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+    
     @GetMapping
-    public List<Appuntamento> getAllAppuntamenti() {
+    public List<AppuntamentoDTO> getAllAppuntamenti() {
     	System.out.println("IN APPUNTAMENTO MICROSERVICE");
         return appuntamentoService.getAllAppuntamenti();
     }
@@ -46,7 +58,7 @@ public class AppuntamentoController {
 
 
 
-    @GetMapping("/{appuntamentoId}")
+ /*   @GetMapping("/{appuntamentoId}")
     public AppuntamentoDTO getAppuntamento(@PathVariable String appuntamentoId) {
     	Optional<Appuntamento> appuntamento= appuntamentoService.getAppuntamento(appuntamentoId);
     	 if (appuntamento.isPresent()) {
@@ -60,12 +72,62 @@ public class AppuntamentoController {
     	        return appuntamentoService.convertToDTO(appuntamento.get(), operazioni);
     	 }
     	    throw new RuntimeException("Appuntamento non trovato");
-    }
+    }*/
     @PostMapping
     public Appuntamento createAppuntamento(@RequestBody Appuntamento appuntamento) {
         return appuntamentoService.createAppuntamento(appuntamento);
     }
+/*
+ * 
+@PostMapping
+public Appuntamento createAppuntamento(@RequestBody AppuntamentoDTO appuntamentoDTO) {
+    Appuntamento appuntamento = new Appuntamento();
+    appuntamento.setDataEOrario(appuntamentoDTO.getDataEOrario());
+    appuntamento.setTrattamento(appuntamentoDTO.getTrattamento());
+    appuntamento.setNote(appuntamentoDTO.getNote());
 
+    // Converti le operazioni da stringhe a ObjectId
+    appuntamento.setOperazioni(appuntamentoDTO.getOperazioniIds().stream()
+        .map(ObjectId::new)
+        .collect(Collectors.toList()));
+
+    appuntamento.setPazienteId(appuntamentoDTO.getPaziente().getId());
+    appuntamento.setDentistaId(appuntamentoDTO.getDentistaId());
+    
+    return appuntamentoService.createAppuntamento(appuntamento);
+}
+
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Appuntamento> updateAppuntamento(@PathVariable String id, @RequestBody AppuntamentoDTO appuntamentoDTO) {
+        if (!ObjectId.isValid(id)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<Appuntamento> updatedAppuntamento = appuntamentoService.updateAppuntamento(id, appuntamentoDTO);
+        return updatedAppuntamento
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+
+
+@DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAppuntamento(@PathVariable String id) {
+        if (!ObjectId.isValid(id)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        boolean deleted = appuntamentoService.deleteAppuntamento(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+ */
+    
     @PutMapping("/{appuntamentoId}")
     public Appuntamento updateAppuntamento(@PathVariable String appuntamentoId, @RequestBody Appuntamento appuntamento) {
         return appuntamentoService.updateAppuntamento(appuntamentoId, appuntamento);

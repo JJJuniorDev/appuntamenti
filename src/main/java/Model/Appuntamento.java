@@ -37,11 +37,11 @@ public class Appuntamento {
     private List<ObjectId> operazioni;
 
     @DBRef
-    @Field("PAZIENTE")
-    private Paziente paziente;
+    @Field("PAZIENTE_ID")
+    private ObjectId pazienteId;
     
     @Field("DENTISTA_ID") // Nuovo campo per salvare il riferimento al dentista
-    private String dentistaId;
+    private ObjectId dentistaId;
     
     public String getId() {
         return id.toHexString();
@@ -94,30 +94,26 @@ public class Appuntamento {
 		this.operazioni = operazioni;
 	}
 
-
-	public Paziente getPaziente() {
-		return paziente;
-	}
-
-
-	public void setPaziente(Paziente paziente) {
-		this.paziente = paziente;
-	}
-
+	   public String getPazienteId() {
+	        return pazienteId != null ? pazienteId.toHexString() : null;
+	    }
+	   
+	  public void setPazienteId(String pazienteId) {
+	        this.pazienteId = new ObjectId(pazienteId);
+	    }
 
 	public void setId(ObjectId id) {
 		this.id = id;
 	}
 
 
-	public String getDentistaId() {
-		return dentistaId;
-	}
+	  public String getDentistaId() {
+	        return dentistaId != null ? dentistaId.toHexString() : null;
+	    }
 
-
-	public void setDentistaId(String dentistaId) {
-		this.dentistaId = dentistaId;
-	}
+	    public void setDentistaId(String dentistaId) {
+	        this.dentistaId = new ObjectId(dentistaId);
+	    }
 
 
 	
